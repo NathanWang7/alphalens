@@ -196,11 +196,11 @@ def factor_weights(factor_data,
     if group_adjust:
         grouper.append('group')
 
-    weights = factor_data.groupby(grouper)['factor'] \
+    weights = factor_data.groupby(grouper, group_keys=False)['factor'] \
         .apply(to_weights, demeaned, equal_weight)
 
     if group_adjust:
-        weights = weights.groupby(level='date').apply(to_weights, False, False)
+        weights = weights.groupby(level='date', group_keys=False).apply(to_weights, False, False)
 
     return weights
 

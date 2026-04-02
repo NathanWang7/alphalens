@@ -163,7 +163,7 @@ def quantize_factor(factor_data,
     if by_group:
         grouper.append('group')
 
-    factor_quantile = factor_data.groupby(grouper)['factor'] \
+    factor_quantile = factor_data.groupby(grouper, group_keys=False)['factor'] \
         .apply(quantile_calc, quantiles, bins, zero_aware, no_raise)
     factor_quantile.name = 'factor_quantile'
 
@@ -285,9 +285,9 @@ def compute_forward_returns(factor,
 
     for period in sorted(periods):
         if cumulative_returns:
-            returns = prices.pct_change(period)
+            returns = prices.pct_change(period, fill_method=None)
         else:
-            returns = prices.pct_change()
+            returns = prices.pct_change(fill_method=None)
 
         forward_returns = \
             returns.shift(-period).reindex(factor_dateindex)
@@ -313,10 +313,10 @@ def compute_forward_returns(factor,
                 continue
             start = prices.index[p_idx]
             end = prices.index[p_idx + period]
-            period_len = diff_custom_calendar_timedeltas(start, end, freq)
+            period_len: pd.Timedelta = diff_custom_calendar_timedeltas(start, end, freq)
             days_diffs.append(period_len.components.days)
 
-        delta_days = period_len.components.days - mode(days_diffs).mode[0]
+        delta_days = period_len.components.days - mode(days_diffs, keepdims=True).mode[0]
         period_len -= pd.Timedelta(days=delta_days)
         label = timedelta_to_string(period_len)
 

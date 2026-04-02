@@ -22,3 +22,7 @@ dist
 
 # Emacs temp files.
 *~
+
+*.ipynb
+.vscode
+.pytest_cache
